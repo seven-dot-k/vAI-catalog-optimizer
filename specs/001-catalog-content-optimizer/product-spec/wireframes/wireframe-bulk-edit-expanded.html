@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireframe: Expanded Row — Catalog Content Optimizer</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; padding: 20px; }
+    .wireframe-nav { text-align: center; margin-bottom: 20px; font-size: 0.85rem; }
+    .wireframe-nav a { margin: 0 8px; color: #0066cc; }
+    .card { max-width: 820px; margin: 0 auto; background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+    .card-header { padding: 16px; border-bottom: 1px solid #eee; }
+    .card-header h2 { margin: 0 0 4px 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+    .card-header p { margin: 0; font-size: 0.85rem; color: #666; }
+    .table-header { display: grid; grid-template-columns: 40px 1fr 120px 100px 40px; padding: 8px 16px; background: #f8f8f8; border-bottom: 1px solid #eee; font-size: 0.75rem; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.05em; align-items: center; }
+    .table-row { display: grid; grid-template-columns: 40px 1fr 120px 100px 40px; padding: 10px 16px; border-bottom: 1px solid #f0f0f0; align-items: center; cursor: pointer; font-size: 0.9rem; }
+    .table-row:hover { background: #fafafa; }
+    .table-row.expanded { background: #f0f7ff; border-bottom: none; }
+    .thumb { width: 32px; height: 32px; background: #e0e0e0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #999; }
+    .name { font-weight: 500; }
+    .category { color: #888; font-size: 0.85rem; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+    .badge-done { background: #e6f4ea; color: #137333; }
+    .badge-pending { background: #f0f0f0; color: #888; }
+    .chevron { color: #999; font-size: 1.2rem; text-align: center; }
+    .chevron.open { transform: rotate(90deg); }
+
+    /* Expanded content */
+    .expanded-content { padding: 0 16px 16px 16px; border-bottom: 1px solid #ddd; background: #fafcff; }
+    .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .column-header { font-size: 0.8rem; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e0e0; }
+    .field-group { margin-bottom: 12px; }
+    .field-label { font-size: 0.75rem; font-weight: 600; color: #888; margin-bottom: 4px; }
+    .field-value { font-size: 0.85rem; line-height: 1.5; color: #333; background: #f0f0f0; padding: 8px 10px; border-radius: 4px; min-height: 60px; }
+    .field-value.readonly { background: #f5f5f5; color: #666; }
+    textarea.field-edit { font-family: inherit; font-size: 0.85rem; line-height: 1.5; color: #333; background: white; border: 1px solid #ccc; padding: 8px 10px; border-radius: 4px; min-height: 60px; width: 100%; box-sizing: border-box; resize: vertical; }
+    textarea.field-edit:focus { border-color: #0066cc; outline: none; box-shadow: 0 0 0 2px rgba(0,102,204,0.15); }
+
+    .seo-section { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ddd; }
+    .seo-label { font-size: 0.7rem; color: #999; font-weight: 600; text-transform: uppercase; }
+
+    .footer { padding: 16px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .footer .summary { font-size: 0.85rem; color: #666; }
+    .approve-btn { background: #137333; color: white; border: none; border-radius: 6px; padding: 8px 20px; font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <!-- Product Forge Wireframe | Feature: catalog-content-optimizer | Screen: bulk-edit-expanded -->
+  <div class="wireframe-nav">
+    <strong>Screens:</strong>
+    <a href="./index.html">Index</a>
+    <a href="./wireframe-chat-interface.html">Chat Interface</a>
+    <a href="./wireframe-bulk-edit-table.html">Bulk Edit Table</a>
+    <a href="./wireframe-bulk-edit-expanded.html"><strong>Expanded Row</strong></a>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>📋 Product Descriptions — Electronics</h2>
+      <p>All 12 products optimized. Review and approve changes.</p>
+    </div>
+
+    <div class="table-header">
+      <span></span>
+      <span>Product</span>
+      <span>Category</span>
+      <span>Status</span>
+      <span></span>
+    </div>
+
+    <!-- Expanded row -->
+    <div class="table-row expanded">
+      <div class="thumb">IMG</div>
+      <div class="name">Wireless Headphones Pro</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-done">Done</span>
+      <div class="chevron open">›</div>
+    </div>
+
+    <div class="expanded-content">
+      <div class="comparison-grid">
+        <div>
+          <div class="column-header">Current</div>
+
+          <div class="field-group">
+            <div class="field-label">Short Description</div>
+            <div class="field-value readonly">Premium wireless headphones with noise cancellation.</div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Long Description</div>
+            <div class="field-value readonly">Our wireless headphones feature active noise cancellation, 30-hour battery life, and premium drivers for exceptional audio quality. Comfortable over-ear design with memory foam cushions.</div>
+          </div>
+
+          <div class="seo-section">
+            <div class="seo-label">SEO Data</div>
+            <div class="field-group">
+              <div class="field-label">Meta Title</div>
+              <div class="field-value readonly">Wireless Headphones Pro | Electronics</div>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Meta Description</div>
+              <div class="field-value readonly">Buy Wireless Headphones Pro online.</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="column-header">Proposed (editable)</div>
+
+          <div class="field-group">
+            <div class="field-label">Short Description</div>
+            <textarea class="field-edit" rows="2">Experience pure sound with our award-winning Wireless Headphones Pro — featuring industry-leading ANC and all-day comfort.</textarea>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Long Description</div>
+            <textarea class="field-edit" rows="5">Immerse yourself in crystal-clear audio with the Wireless Headphones Pro. Our advanced active noise cancellation blocks out the world while custom-tuned 40mm drivers deliver rich, detailed sound across every frequency. With 30 hours of battery life and luxurious memory foam ear cushions, these headphones are built for marathon listening sessions — whether you're commuting, working, or unwinding.</textarea>
+          </div>
+
+          <div class="seo-section">
+            <div class="seo-label">SEO Data</div>
+            <div class="field-group">
+              <div class="field-label">Meta Title</div>
+              <textarea class="field-edit" rows="1">Wireless Headphones Pro — Premium ANC Over-Ear Headphones</textarea>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Meta Description</div>
+              <textarea class="field-edit" rows="2">Shop the Wireless Headphones Pro with industry-leading noise cancellation, 30-hour battery, and memory foam comfort. Free shipping on orders over $50.</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Collapsed rows -->
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">USB-C Hub 7-in-1</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-done">Done</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">Smart Watch Series X</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-done">Done</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">Portable Bluetooth Speaker</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-done">Done</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="footer">
+      <div class="summary">12 of 12 complete — ready for approval</div>
+      <button class="approve-btn">✓ Approve Changes</button>
+    </div>
+  </div>
+</body>
+</html>

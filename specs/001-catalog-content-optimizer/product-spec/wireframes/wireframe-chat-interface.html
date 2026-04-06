@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireframe: Chat Interface — Catalog Content Optimizer</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; padding: 20px; }
+    .wireframe-nav { text-align: center; margin-bottom: 20px; font-size: 0.85rem; }
+    .wireframe-nav a { margin: 0 8px; color: #0066cc; }
+    .screen { max-width: 900px; margin: 0 auto; background: white; border: 2px solid #333; min-height: 700px; display: flex; flex-direction: column; }
+    .header { background: #1a1a1a; color: white; padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+    .header .logo { font-weight: 700; font-size: 1.1rem; }
+    .header .status { font-size: 0.8rem; color: #aaa; margin-left: auto; }
+    .chat-area { flex: 1; padding: 16px; overflow-y: auto; }
+    .message { margin-bottom: 16px; max-width: 80%; }
+    .message.user { margin-left: auto; }
+    .message.assistant { margin-right: auto; }
+    .bubble { padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; line-height: 1.4; }
+    .user .bubble { background: #0066cc; color: white; border-bottom-right-radius: 4px; }
+    .assistant .bubble { background: #eee; color: #333; border-bottom-left-radius: 4px; }
+    .role { font-size: 0.75rem; color: #999; margin-bottom: 4px; }
+    .data-part { background: #f8f8f8; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-top: 8px; }
+    .data-part-label { font-size: 0.75rem; color: #666; font-weight: 600; margin-bottom: 8px; }
+    .input-area { border-top: 1px solid #ddd; padding: 12px 16px; display: flex; gap: 8px; }
+    .input-field { flex: 1; border: 1px solid #ccc; border-radius: 8px; padding: 10px 14px; font-size: 0.9rem; outline: none; }
+    .send-btn { background: #0066cc; color: white; border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-weight: 600; }
+    .placeholder { color: #bbb; font-style: italic; }
+  </style>
+</head>
+<body>
+  <!-- Product Forge Wireframe | Feature: catalog-content-optimizer | Screen: chat-interface -->
+  <div class="wireframe-nav">
+    <strong>Screens:</strong>
+    <a href="./index.html">Index</a>
+    <a href="./wireframe-chat-interface.html"><strong>Chat Interface</strong></a>
+    <a href="./wireframe-bulk-edit-table.html">Bulk Edit Table</a>
+    <a href="./wireframe-bulk-edit-expanded.html">Expanded Row</a>
+  </div>
+
+  <div class="screen">
+    <div class="header">
+      <span class="logo">📦 CatalogManager</span>
+      <span class="status">Session: active • workflow-run-abc123</span>
+    </div>
+
+    <div class="chat-area">
+      <div class="message assistant">
+        <div class="role">Assistant</div>
+        <div class="bubble">
+          Hi! I'm your catalog content optimizer. I can generate product
+          descriptions, SEO metadata, and category content using your
+          brand voice. What would you like to optimize?
+        </div>
+      </div>
+
+      <div class="message user">
+        <div class="role">You</div>
+        <div class="bubble">
+          Optimize descriptions for all products in the Electronics category
+        </div>
+      </div>
+
+      <div class="message assistant">
+        <div class="role">Assistant</div>
+        <div class="bubble">
+          I'll fetch the products in Electronics and generate optimized
+          descriptions using your brand voice. Let me get started...
+        </div>
+        <div class="data-part">
+          <div class="data-part-label">🔧 Tool: get_products (category: electronics)</div>
+          <span class="placeholder">Found 12 products</span>
+        </div>
+        <div class="data-part">
+          <div class="data-part-label">🔧 Tool: get_brand_voice</div>
+          <span class="placeholder">Brand voice loaded</span>
+        </div>
+        <div class="data-part">
+          <div class="data-part-label">📋 Bulk Edit Table — inline data part</div>
+          <span class="placeholder">[See wireframe-bulk-edit-table.html]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <input class="input-field" type="text" placeholder="Ask me to optimize products, categories, or SEO data..." />
+      <button class="send-btn">Send</button>
+    </div>
+  </div>
+</body>
+</html>

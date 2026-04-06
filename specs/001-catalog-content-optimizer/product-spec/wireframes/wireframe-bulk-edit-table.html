@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireframe: Bulk Edit Table — Catalog Content Optimizer</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; padding: 20px; }
+    .wireframe-nav { text-align: center; margin-bottom: 20px; font-size: 0.85rem; }
+    .wireframe-nav a { margin: 0 8px; color: #0066cc; }
+    .card { max-width: 820px; margin: 0 auto; background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+    .card-header { padding: 16px; border-bottom: 1px solid #eee; }
+    .card-header h2 { margin: 0 0 4px 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+    .card-header p { margin: 0; font-size: 0.85rem; color: #666; }
+    .table-header { display: grid; grid-template-columns: 40px 1fr 120px 100px 40px; padding: 8px 16px; background: #f8f8f8; border-bottom: 1px solid #eee; font-size: 0.75rem; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.05em; align-items: center; }
+    .table-row { display: grid; grid-template-columns: 40px 1fr 120px 100px 40px; padding: 10px 16px; border-bottom: 1px solid #f0f0f0; align-items: center; cursor: pointer; font-size: 0.9rem; }
+    .table-row:hover { background: #fafafa; }
+    .thumb { width: 32px; height: 32px; background: #e0e0e0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #999; }
+    .name { font-weight: 500; }
+    .category { color: #888; font-size: 0.85rem; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+    .badge-pending { background: #f0f0f0; color: #888; }
+    .badge-inprogress { background: #e8f0fe; color: #1967d2; }
+    .badge-done { background: #e6f4ea; color: #137333; }
+    .chevron { color: #999; font-size: 1.2rem; text-align: center; }
+    .footer { padding: 16px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .footer .summary { font-size: 0.85rem; color: #666; }
+    .approve-btn { background: #137333; color: white; border: none; border-radius: 6px; padding: 8px 20px; font-weight: 600; cursor: pointer; }
+    .approve-btn:disabled { background: #ccc; cursor: not-allowed; }
+    .progress-bar { height: 3px; background: #e0e0e0; border-radius: 2px; margin-top: 8px; }
+    .progress-fill { height: 3px; background: #1967d2; border-radius: 2px; width: 58%; }
+  </style>
+</head>
+<body>
+  <!-- Product Forge Wireframe | Feature: catalog-content-optimizer | Screen: bulk-edit-table -->
+  <div class="wireframe-nav">
+    <strong>Screens:</strong>
+    <a href="./index.html">Index</a>
+    <a href="./wireframe-chat-interface.html">Chat Interface</a>
+    <a href="./wireframe-bulk-edit-table.html"><strong>Bulk Edit Table</strong></a>
+    <a href="./wireframe-bulk-edit-expanded.html">Expanded Row</a>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>📋 Product Descriptions — Electronics</h2>
+      <p>Generating optimized descriptions for 12 products using brand voice</p>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+    </div>
+
+    <div class="table-header">
+      <span></span>
+      <span>Product</span>
+      <span>Category</span>
+      <span>Status</span>
+      <span></span>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">Wireless Headphones Pro</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-done">Done</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">USB-C Hub 7-in-1</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-done">Done</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">Smart Watch Series X</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-done">Done</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">Portable Bluetooth Speaker</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-done">Done</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">4K Webcam Ultra</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-done">Done</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">Mechanical Keyboard RGB</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-done">Done</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">Noise Cancelling Earbuds</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-inprogress">InProgress</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">Laptop Stand Adjustable</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-pending">Pending</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">Wireless Charging Pad</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-pending">Pending</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">Gaming Mouse Elite</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-pending">Pending</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">Monitor Light Bar</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-pending">Pending</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="table-row">
+      <div class="thumb">IMG</div>
+      <div class="name">USB Microphone Studio</div>
+      <div class="category">Electronics</div>
+      <span class="badge badge-pending">Pending</span>
+      <div class="chevron">›</div>
+    </div>
+
+    <div class="footer">
+      <div class="summary">7 of 12 complete</div>
+      <button class="approve-btn" disabled>Approve Changes</button>
+    </div>
+  </div>
+</body>
+</html>
