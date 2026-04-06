@@ -2,6 +2,8 @@
 
 An AI-powered e-commerce catalog content optimizer built on **Vercel Workflows** and the **Vercel AI SDK**. CatalogManager AI uses a Durable Agent to orchestrate multi-turn conversations where catalog operators can generate, review, edit, and approve product descriptions and SEO metadata — all guided by brand voice.
 
+### → [Architectural Decisions](#architectural-decisions)
+
 
 
 ## Features
@@ -97,6 +99,115 @@ Workflow (Vercel Workflows)
         ├── chatMessageHook (multi-turn)
         └── contentApprovalHook (human-in-the-loop)
 ```
+
+## Architectural Decisions
+
+### 1. Single Workflow Per Session
+Each user session is a single, long-running `catalogAgentWorkflow` instance. The entire conversation — all turns, all tool calls, all state — lives inside one workflow run. Follow-up messages are injected via `chatMessageHook` rather than starting a new run.
+
+---
+
+### 2. Dual-Model Strategy: Orchestrator vs. Generator
+Two separate Claude models serve distinct roles:
+
+- **Claude Sonnet 4.6** — Runs the `DurableAgent`. Handles multi-step reasoning, tool orchestration, and interpreting ambiguous user intent across multi-turn conversations. Used for its stronger reasoning capability.
+- **Claude Haiku 4.5** — Runs inside `generate_descriptions` and `generate_seo_data`. Handles fast, structured content generation via `Output.object()` and a Zod schema. Used for cost efficiency and speed on repetitive generation tasks.
+
+**Rationale:** Separating orchestration from generation allows each layer to use the right model for the right job. Haiku is called once per item in a loop; using Sonnet here would be unnecessarily expensive.
+
+---
+
+### 3. `toolCallId` as the Approval Resumption Token
+
+When `save_products` or `save_categories` runs, it creates a `contentApprovalHook` using the tool call's own `toolCallId` as the token:
+
+```ts
+const hook = contentApprovalHook.create({ token: toolCallId });
+```
+
+The frontend identifies pending save tool calls by scanning message parts for `save_products`/`save_categories` without output, then POSTs the same `toolCallId` to `/api/hooks/approval` to resume the hook.
+
+This eliminates any need for a separate ID mapping layer — the same identifier used by the AI SDK to track tool calls is reused as the workflow resumption key.
+
+Note: The name "save*" is misleading since the tool doesn't immediately save, created it before fully understanding the approval hook flow 
+
+---
+
+### 4. Agent Calls Save Immediately — Approval Is a Workflow Concern
+The system prompt instructs the agent to call `save_products` or `save_categories` immediately after content generation.
+The save tool itself suspends, indefinitely, via the approval hook until the human acts in the review panel.
+
+Note: The name "save*" is misleading since the tool doesn't immediately save, created it before fully understanding the approval hook flow 
+---
+
+### 5. Per-Item Generation as Durable Steps
+Each call to `generateSingleDescription` and `generateSingleSeoData` is a `"use step"` function inside the generation tools. This means:
+- Each item is independently retried on failure (transient LLM errors don't restart the whole batch)
+- Per-item progress is observable in the Vercel Workflows dashboard
+- The workflow can resume from the last incomplete item after a crash
+
+**Rejected alternative:** Processing all items in a single LLM call would be faster but loses per-item retry guarantees and makes structured output harder to validate.
+
+---
+
+### 6. Streaming Data Parts for Real-Time UI Status
+Generation tools emit custom `UIMessageChunk` data parts (`data-product-content`, `data-category-content`) with a status field (`Pending → InProgress → Done`) as each item is processed:
+
+```ts
+writer.write({ type: "data-product-content", id: `${toolCallId}-${sku}`, data: { status: "InProgress", ... } });
+```
+
+The frontend aggregates these parts into a unified catalog panel without polling or a separate state management layer. The AI SDK's data parts streaming is the only transport used.
+
+---
+
+### 7. Session Persistence via URL + `localStorage` + Stream Reconnection
+The workflow run ID is persisted in both `localStorage` and as a `?session=` URL query parameter. On page load, `useMultiTurnChat` checks for an existing run ID and reconnects to the live stream via `GET /api/chat/[id]/stream`. This allows sharing sessions by URL and surviving page refreshes without losing state.
+
+---
+
+### 8. In-Memory Store (POC-First, No Database)
+Product and category data live in JSON fixtures in `lib/data/`. Approved saves update an in-memory mutable store (`lib/data/store.ts`). No database, no auth, no persistence across server restarts.
+
+**Why:** The project constitution mandates POC-first simplicity. Introducing a database would add operational complexity before the core AI workflow is validated.
+
+---
+
+### 9. Zod Schemas as the Shared Type Layer
+Zod schemas in `lib/schemas/` serve three purposes simultaneously:
+1. **Runtime validation** — Tool inputs are validated via `inputSchema` Zod objects
+2. **Structured generation** — `Output.object({ schema })` passes the Zod schema directly to `generateText` for constrained LLM output
+3. **TypeScript types** — `z.infer<typeof schema>` provides static types across the codebase
+
+One schema definition serves all three concerns with zero duplication.
+
+---
+
+### 10. `FatalError` vs. `RetryableError` for Workflow Failures
+Tools use Vercel Workflows' error classification:
+- `FatalError` — for validation failures (e.g., missing content fields, invalid update payloads) that should never be retried
+- `RetryableError` — for transient failures (e.g., LLM API timeouts) that benefit from automatic retry
+
+This prevents infinite retry loops on logic errors while enabling automatic recovery from network-level failures.
+
+---
+
+### 11. Generated Content Is Never Echoed in Chat
+The system prompt explicitly instructs the agent **not** to repeat or summarize generated descriptions or SEO data in its chat response. All content is surfaced exclusively via the streaming `data-product-content`/`data-category-content` parts rendered in the catalog panel.
+
+**Why:** Duplicating content in the chat creates noisy, hard-to-read conversations and wastes output tokens. The data part stream is the canonical content channel.
+
+---
+
+### 12. Eval Strategy: Deterministic Mocks + Optional Live LLM
+The eval suite (`src/__tests__/evals/`) tests agent behavior at two levels:
+
+- **Mocked evals** — `MockLanguageModelV3` from `ai/test` replays scripted tool-call sequences deterministically. Tool `execute` functions are replaced with `vi.fn()` mocks. Assertions target tool names, parameter shapes, and call ordering — not LLM text output. These run in under 60 seconds with no API dependency.
+- **Live LLM evals** — Same mock tool `execute` functions, but real `anthropic/claude-haiku-4-5` model reasoning. Gated by `EVAL_LIVE_LLM` + `AI_GATEWAY_API_KEY` env vars. Validates that the system prompt produces correct tool routing with real model inference.
+
+`DurableAgent` is tested directly (bypassing the workflow runtime) by passing a mock model via the function form: `model: () => Promise.resolve(mockModel)`.
+
+---
 
 ## Getting Started
 
