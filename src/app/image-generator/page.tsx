@@ -4,31 +4,31 @@ import { useState, useCallback } from "react";
 import { ProductImageGenerator } from "@/components/catalog/product-image-generator";
 import type { GeneratedImage, VariantGroup } from "@/lib/schemas/product-image";
 
-// Mock data for demonstration
+// Mock data for demonstration - use static dates to avoid hydration mismatch
 const mockImages: GeneratedImage[] = [
   {
     id: "img-1",
     url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop",
     status: "pending",
-    createdAt: new Date().toISOString(),
+    createdAt: "2024-01-15T10:30:00.000Z",
   },
   {
     id: "img-2",
     url: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=400&fit=crop",
     status: "approved",
-    createdAt: new Date().toISOString(),
+    createdAt: "2024-01-15T10:31:00.000Z",
   },
   {
     id: "img-3",
     url: "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&h=400&fit=crop",
     status: "rejected",
-    createdAt: new Date().toISOString(),
+    createdAt: "2024-01-15T10:32:00.000Z",
   },
   {
     id: "img-4",
     url: "https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=400&h=400&fit=crop",
     status: "pending",
-    createdAt: new Date().toISOString(),
+    createdAt: "2024-01-15T10:33:00.000Z",
   },
 ];
 
