@@ -30,54 +30,44 @@ const mockImages: GeneratedImage[] = [
     status: "pending",
     createdAt: new Date().toISOString(),
   },
-  {
-    id: "img-5",
-    url: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=400&fit=crop",
-    status: "pending",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "img-6",
-    url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
-    status: "pending",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "img-7",
-    url: "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=400&h=400&fit=crop",
-    status: "pending",
-    createdAt: new Date().toISOString(),
-  },
 ];
 
 // Available product attributes for building variant groups
 const availableAttributes = [
   { name: "color", values: ["blue", "red", "black", "white"] },
   { name: "size", values: ["small", "medium", "large"] },
-  { name: "material", values: ["leather", "fabric", "mesh"] },
 ];
 
 export default function ImageGeneratorDemo() {
   const [images, setImages] = useState<GeneratedImage[]>(mockImages);
   const [variantGroups, setVariantGroups] = useState<VariantGroup[]>([]);
+  const [debugLog, setDebugLog] = useState<string[]>([]);
+
+  const addLog = useCallback((msg: string) => {
+    console.log("[v0]", msg);
+    setDebugLog((prev) => [...prev.slice(-9), `${new Date().toISOString().slice(11, 19)}: ${msg}`]);
+  }, []);
 
   const handleApprove = useCallback((imageId: string) => {
+    addLog(`Approve clicked: ${imageId}`);
     setImages((prev) =>
       prev.map((img) =>
         img.id === imageId ? { ...img, status: "approved" as const } : img
       )
     );
-  }, []);
+  }, [addLog]);
 
   const handleReject = useCallback((imageId: string) => {
+    addLog(`Reject clicked: ${imageId}`);
     setImages((prev) =>
       prev.map((img) =>
         img.id === imageId ? { ...img, status: "rejected" as const } : img
       )
     );
-  }, []);
+  }, [addLog]);
 
   const handleImageAssign = useCallback((imageId: string, groupId: string | null) => {
+    addLog(`Image assigned: ${imageId} -> ${groupId || "unassigned"}`);
     setImages((prev) =>
       prev.map((img) =>
         img.id === imageId
@@ -85,14 +75,15 @@ export default function ImageGeneratorDemo() {
           : img
       )
     );
-  }, []);
+  }, [addLog]);
 
   const handleVariantGroupCreate = useCallback((group: VariantGroup) => {
+    addLog(`Group created: ${group.name}`);
     setVariantGroups((prev) => [...prev, group]);
-  }, []);
+  }, [addLog]);
 
   const handleVariantGroupDelete = useCallback((groupId: string) => {
-    // First, unassign all images from this group
+    addLog(`Group deleted: ${groupId}`);
     setImages((prev) =>
       prev.map((img) =>
         img.variantGroupId === groupId
@@ -100,9 +91,8 @@ export default function ImageGeneratorDemo() {
           : img
       )
     );
-    // Then delete the group
     setVariantGroups((prev) => prev.filter((g) => g.id !== groupId));
-  }, []);
+  }, [addLog]);
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -112,6 +102,18 @@ export default function ImageGeneratorDemo() {
           <p className="text-muted-foreground">
             Review AI-generated images and organize them into variant groups using drag and drop.
           </p>
+        </div>
+
+        {/* Debug Log Panel */}
+        <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-4">
+          <h3 className="text-sm font-medium text-amber-400 mb-2">Debug Log (Latest 10)</h3>
+          <div className="font-mono text-xs text-amber-300 space-y-0.5">
+            {debugLog.length === 0 ? (
+              <p className="text-muted-foreground">No actions yet. Try clicking buttons or dragging images.</p>
+            ) : (
+              debugLog.map((log, i) => <div key={i}>{log}</div>)
+            )}
+          </div>
         </div>
 
         <ProductImageGenerator
@@ -126,40 +128,6 @@ export default function ImageGeneratorDemo() {
           onVariantGroupCreate={handleVariantGroupCreate}
           onVariantGroupDelete={handleVariantGroupDelete}
         />
-
-        {/* Instructions */}
-        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-foreground">How to Use</h3>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium">
-                1
-              </div>
-              <h4 className="font-medium text-foreground">Create Variant Groups</h4>
-              <p className="text-sm text-muted-foreground">
-                Click &quot;Add Variant Group&quot; and select attribute combinations like Color: Blue + Size: Large.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium">
-                2
-              </div>
-              <h4 className="font-medium text-foreground">Drag and Drop Images</h4>
-              <p className="text-sm text-muted-foreground">
-                Drag images from the unassigned pool into variant groups. Drag between groups to reassign.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium">
-                3
-              </div>
-              <h4 className="font-medium text-foreground">Review and Approve</h4>
-              <p className="text-sm text-muted-foreground">
-                Click images to preview. Use approve/reject buttons to manage image status.
-              </p>
-            </div>
-          </div>
-        </div>
 
         {/* Current State Debug */}
         <details className="rounded-xl border border-border bg-card p-4">

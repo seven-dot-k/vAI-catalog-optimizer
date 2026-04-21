@@ -114,16 +114,22 @@ function ImageThumbnail({
       {/* Action Buttons */}
       <div className="mt-1.5 flex gap-1">
         <Button
+          type="button"
           variant={image.status === "approved" ? "success" : "outline"}
           size="sm"
           className="h-7 flex-1 text-xs"
-          onClick={onApprove}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onApprove();
+          }}
           disabled={image.status === "approved"}
         >
           <Check className="mr-0.5 h-3 w-3" />
           Approve
         </Button>
         <Button
+          type="button"
           variant="outline"
           size="sm"
           className={cn(
@@ -131,7 +137,11 @@ function ImageThumbnail({
             image.status === "rejected" &&
               "border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300"
           )}
-          onClick={onReject}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onReject();
+          }}
           disabled={image.status === "rejected"}
         >
           <X className="mr-0.5 h-3 w-3" />
@@ -187,9 +197,14 @@ function VariantGroupBuilder({
   if (!isOpen) {
     return (
       <Button
+        type="button"
         variant="outline"
         size="sm"
-        onClick={() => setIsOpen(true)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsOpen(true);
+        }}
         className="gap-1.5"
       >
         <Plus className="h-4 w-4" />
@@ -203,7 +218,10 @@ function VariantGroupBuilder({
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-medium text-foreground">Create Variant Group</h4>
         <button
-          onClick={() => {
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             setIsOpen(false);
             setSelectedVariants([]);
           }}
@@ -225,7 +243,12 @@ function VariantGroupBuilder({
                 </label>
                 {selected && (
                   <button
-                    onClick={() => handleRemoveVariant(attr.name)}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleRemoveVariant(attr.name);
+                    }}
                     className="text-xs text-muted-foreground hover:text-foreground"
                   >
                     Clear
@@ -235,8 +258,13 @@ function VariantGroupBuilder({
               <div className="flex flex-wrap gap-1.5">
                 {attr.values.map((value) => (
                   <button
+                    type="button"
                     key={value}
-                    onClick={() => handleAddVariant(attr.name, value)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleAddVariant(attr.name, value);
+                    }}
                     className={cn(
                       "rounded-md border px-2.5 py-1 text-xs transition-colors",
                       selected?.value === value
@@ -266,17 +294,25 @@ function VariantGroupBuilder({
       {/* Actions */}
       <div className="flex gap-2">
         <Button
+          type="button"
           size="sm"
-          onClick={handleCreate}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleCreate();
+          }}
           disabled={selectedVariants.length === 0}
           className="flex-1"
         >
           Create Group
         </Button>
         <Button
+          type="button"
           variant="outline"
           size="sm"
-          onClick={() => {
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             setIsOpen(false);
             setSelectedVariants([]);
           }}
