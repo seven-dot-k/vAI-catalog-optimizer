@@ -1,7 +1,26 @@
 {
   "version": "1.0.0",
   "steps": {
+    "node_modules/workflow/dist/internal/builtins.js": {
+      "__builtin_response_array_buffer": {
+        "stepId": "__builtin_response_array_buffer"
+      },
+      "__builtin_response_json": {
+        "stepId": "__builtin_response_json"
+      },
+      "__builtin_response_text": {
+        "stepId": "__builtin_response_text"
+      }
+    },
+    "src/workflows/tools/get-categories.ts": {
+      "executeGetCategories": {
+        "stepId": "step//./src/workflows/tools/get-categories//executeGetCategories"
+      }
+    },
     "src/workflows/steps/writer.ts": {
+      "writeAgentSwitch": {
+        "stepId": "step//./src/workflows/steps/writer//writeAgentSwitch"
+      },
       "writeStreamClose": {
         "stepId": "step//./src/workflows/steps/writer//writeStreamClose"
       },
@@ -17,12 +36,29 @@
         "stepId": "step//./src/workflows/tools/save-products//persistProductUpdates"
       }
     },
-    "src/workflows/tools/generate-seo-data.ts": {
-      "emitPendingItems": {
-        "stepId": "step//./src/workflows/tools/generate-seo-data//emitPendingItems"
-      },
-      "generateSingleSeoData": {
-        "stepId": "step//./src/workflows/tools/generate-seo-data//generateSingleSeoData"
+    "src/workflows/tools/cancel-order.ts": {
+      "executeCancelOrder": {
+        "stepId": "step//./src/workflows/tools/cancel-order//executeCancelOrder"
+      }
+    },
+    "src/workflows/tools/lookup-orders.ts": {
+      "executeLookupOrders": {
+        "stepId": "step//./src/workflows/tools/lookup-orders//executeLookupOrders"
+      }
+    },
+    "src/workflows/tools/get-brand-voice.ts": {
+      "executeGetBrandVoice": {
+        "stepId": "step//./src/workflows/tools/get-brand-voice//executeGetBrandVoice"
+      }
+    },
+    "src/workflows/tools/handoff.ts": {
+      "executeHandoff": {
+        "stepId": "step//./src/workflows/tools/handoff//executeHandoff"
+      }
+    },
+    "src/workflows/tools/save-categories.ts": {
+      "persistCategoryUpdates": {
+        "stepId": "step//./src/workflows/tools/save-categories//persistCategoryUpdates"
       }
     },
     "src/workflows/tools/generate-descriptions.ts": {
@@ -33,19 +69,27 @@
         "stepId": "step//./src/workflows/tools/generate-descriptions//generateSingleDescription"
       }
     },
-    "src/workflows/tools/get-brand-voice.ts": {
-      "executeGetBrandVoice": {
-        "stepId": "step//./src/workflows/tools/get-brand-voice//executeGetBrandVoice"
+    "node_modules/@workflow/ai/dist/agent/do-stream-step.js": {
+      "doStreamStep": {
+        "stepId": "step//@workflow/ai@4.1.0-beta.60//doStreamStep"
       }
     },
-    "node_modules/workflow/dist/stdlib.js": {
-      "fetch": {
-        "stepId": "step//workflow@4.2.0-beta.76//fetch"
+    "src/workflows/tools/get-order-details.ts": {
+      "executeGetOrderDetails": {
+        "stepId": "step//./src/workflows/tools/get-order-details//executeGetOrderDetails"
       }
     },
-    "src/workflows/tools/get-categories.ts": {
-      "executeGetCategories": {
-        "stepId": "step//./src/workflows/tools/get-categories//executeGetCategories"
+    "src/workflows/tools/generate-seo-data.ts": {
+      "emitPendingItems": {
+        "stepId": "step//./src/workflows/tools/generate-seo-data//emitPendingItems"
+      },
+      "generateSingleSeoData": {
+        "stepId": "step//./src/workflows/tools/generate-seo-data//generateSingleSeoData"
+      }
+    },
+    "src/workflows/agents/triage.ts": {
+      "triageRouteTool/execute": {
+        "stepId": "step//./src/workflows/agents/triage//triageRouteTool/execute"
       }
     },
     "src/workflows/tools/get-products.ts": {
@@ -53,30 +97,14 @@
         "stepId": "step//./src/workflows/tools/get-products//executeGetProducts"
       }
     },
-    "node_modules/workflow/dist/internal/builtins.js": {
-      "__builtin_response_array_buffer": {
-        "stepId": "__builtin_response_array_buffer"
-      },
-      "__builtin_response_json": {
-        "stepId": "__builtin_response_json"
-      },
-      "__builtin_response_text": {
-        "stepId": "__builtin_response_text"
+    "src/workflows/catalog-agent.ts": {
+      "runTriage": {
+        "stepId": "step//./src/workflows/catalog-agent//runTriage"
       }
     },
-    "src/workflows/tools/save-categories.ts": {
-      "persistCategoryUpdates": {
-        "stepId": "step//./src/workflows/tools/save-categories//persistCategoryUpdates"
-      }
-    },
-    "node_modules/@workflow/ai/dist/agent/stream-text-iterator.js": {
-      "writeToolOutputToUI": {
-        "stepId": "step//@workflow/ai@4.1.0-beta.60//writeToolOutputToUI"
-      }
-    },
-    "node_modules/@workflow/ai/dist/agent/do-stream-step.js": {
-      "doStreamStep": {
-        "stepId": "step//@workflow/ai@4.1.0-beta.60//doStreamStep"
+    "node_modules/workflow/dist/stdlib.js": {
+      "fetch": {
+        "stepId": "step//workflow@4.2.0-beta.76//fetch"
       }
     },
     "node_modules/@workflow/ai/dist/agent/durable-agent.js": {
@@ -88,6 +116,11 @@
       },
       "writeFinishChunk": {
         "stepId": "step//@workflow/ai/agent@4.1.0-beta.60//writeFinishChunk"
+      }
+    },
+    "node_modules/@workflow/ai/dist/agent/stream-text-iterator.js": {
+      "writeToolOutputToUI": {
+        "stepId": "step//@workflow/ai@4.1.0-beta.60//writeToolOutputToUI"
       }
     }
   },
@@ -106,6 +139,17 @@
               }
             },
             {
+              "id": "cond_4_node",
+              "type": "conditional",
+              "data": {
+                "label": "!activeAgentId",
+                "nodeKind": "conditional"
+              },
+              "metadata": {
+                "loopId": "loop_2"
+              }
+            },
+            {
               "id": "node_0",
               "type": "agent",
               "data": {
@@ -114,7 +158,36 @@
               },
               "metadata": {
                 "isStepReference": true,
-                "referenceContext": "DurableAgent"
+                "referenceContext": "DurableAgent",
+                "conditionalId": "cond_4",
+                "conditionalBranch": "Then",
+                "loopId": "loop_2"
+              }
+            },
+            {
+              "id": "cond_6_node",
+              "type": "conditional",
+              "data": {
+                "label": "handoffTarget && agentRegistry[handoffTarget]",
+                "nodeKind": "conditional"
+              },
+              "metadata": {
+                "loopId": "loop_2"
+              }
+            },
+            {
+              "id": "node_1",
+              "type": "agent",
+              "data": {
+                "label": "DurableAgent",
+                "nodeKind": "agent"
+              },
+              "metadata": {
+                "isStepReference": true,
+                "referenceContext": "DurableAgent",
+                "conditionalId": "cond_6",
+                "conditionalBranch": "Then",
+                "loopId": "loop_2"
               }
             },
             {
@@ -128,14 +201,40 @@
           ],
           "edges": [
             {
-              "id": "e_start_node_0",
-              "source": "start",
+              "id": "e_cond_4_node_node_0_true",
+              "source": "cond_4_node",
               "target": "node_0",
+              "type": "conditional",
+              "label": "true"
+            },
+            {
+              "id": "e_cond_6_node_node_1_true",
+              "source": "cond_6_node",
+              "target": "node_1",
+              "type": "conditional",
+              "label": "true"
+            },
+            {
+              "id": "e_node_0_cond_6_node",
+              "source": "node_0",
+              "target": "cond_6_node",
               "type": "default"
             },
             {
-              "id": "e_node_0_end",
-              "source": "node_0",
+              "id": "e_node_1_back_cond_4_node",
+              "source": "node_1",
+              "target": "cond_4_node",
+              "type": "loop"
+            },
+            {
+              "id": "e_start_cond_4_node",
+              "source": "start",
+              "target": "cond_4_node",
+              "type": "default"
+            },
+            {
+              "id": "e_node_1_end",
+              "source": "node_1",
               "target": "end",
               "type": "default"
             }

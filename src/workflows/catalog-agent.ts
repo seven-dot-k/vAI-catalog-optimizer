@@ -1,5 +1,7 @@
 import {
   convertToModelMessages,
+  generateText,
+  hasToolCall,
   type UIMessageChunk,
   type UIMessage,
   type ModelMessage,
@@ -17,7 +19,7 @@ import {
   writeAgentSwitch,
 } from "./steps/writer";
 import { agentRegistry, buildTriagePrompt, triageRouteTool } from "./agents";
-import type { AgentDefinition, TriageResult } from "./agents";
+import type { AgentDefinition } from "./agents";
 import { handoffToolDef, isHandoffResult } from "./tools/handoff";
 
 // Re-export for backward compatibility with tests that import from here
@@ -37,34 +39,33 @@ function buildAgent(def: AgentDefinition): DurableAgent {
 }
 
 /**
- * Run the lightweight triage agent to classify a message and pick the best
- * specialist agent. Returns the agent id.
+ * Classify the user's message and pick the best specialist agent.
+ *
+ * Implemented as a step function (full Node.js access) using generateText
+ * instead of DurableAgent.stream() — the workflow sandbox doesn't allow
+ * constructing WritableStream, and triage doesn't need streaming output.
  */
 async function runTriage(
   messages: ModelMessage[],
-  writable: WritableStream<UIMessageChunk>,
 ): Promise<string> {
-  const triage = new DurableAgent({
-    model: "anthropic/claude-sonnet-4-6",
-    instructions: buildTriagePrompt(),
-    tools: { route: triageRouteTool },
-  });
+  "use step";
 
-  const result = await triage.stream({
+  const result = await generateText({
+    model: "anthropic/claude-sonnet-4-6",
+    system: buildTriagePrompt(),
     messages,
-    writable,
-    preventClose: true,
-    sendStart: false,
-    sendFinish: false,
-    maxSteps: 3,
+    tools: { route: triageRouteTool },
+    stopWhen: hasToolCall("route"),
   });
 
   // Find the route tool result in the steps
   for (const step of result.steps) {
     for (const toolResult of step.toolResults ?? []) {
-      const value = (toolResult as unknown as { output: unknown }).output as TriageResult | { error: string };
-      if ("agentId" in value && agentRegistry[value.agentId]) {
-        return value.agentId;
+      const output = (toolResult as unknown as { output: unknown }).output as
+        | { agentId: string; reason: string }
+        | { error: string };
+      if ("agentId" in output && agentRegistry[output.agentId]) {
+        return output.agentId;
       }
     }
   }
@@ -129,7 +130,7 @@ export async function catalogAgentWorkflow(initialMessages: UIMessage[]) {
 
     // --- Triage if no active agent ---
     if (!activeAgentId) {
-      const routed = await runTriage(messages, writable);
+      const routed = await runTriage(messages);
       activeAgentId = routed;
       activeAgent = buildAgent(agentRegistry[routed]);
       await writeAgentSwitch(writable, routed, agentRegistry[routed].name);
@@ -186,9 +187,11 @@ export async function catalogAgentWorkflow(initialMessages: UIMessage[]) {
       totalStepCount,
     );
 
-    messages.push(...result.messages);
-
     // --- Apply handoff: switch agent and re-run this turn ---
+    // Don't push the outgoing agent's messages into history — the handoff
+    // tool result (__handoff sentinel) and "transferring you..." text would
+    // confuse the incoming agent. The new agent starts with just the
+    // original user/assistant history so it has clean context.
     if (handoffTarget && agentRegistry[handoffTarget]) {
       activeAgentId = handoffTarget;
       activeAgent = buildAgent(agentRegistry[handoffTarget]);
@@ -196,6 +199,9 @@ export async function catalogAgentWorkflow(initialMessages: UIMessage[]) {
       // Continue the loop so the new agent can process the conversation
       continue;
     }
+
+    // Only push messages when there was no handoff — normal turn completion
+    messages.push(...result.messages);
 
     // Wait for next user message via hook
     const { message: followUp } = await hook;

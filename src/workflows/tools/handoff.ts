@@ -41,12 +41,13 @@ async function executeHandoff({
 
 /** Build the agent list once so we're not re-computing on every call. */
 const agentList = getAgentSummaries();
+const agentIds = Object.keys(agentRegistry) as [string, ...string[]];
 
 export const handoffToolDef = {
   description: `Transfer the conversation to a different specialist agent. Available agents:\n${agentList}\nCall this when the user's request falls outside your expertise.`,
   inputSchema: z.object({
     targetAgentId: z
-      .string()
+      .enum(agentIds)
       .describe("The id of the agent to hand off to"),
     reason: z
       .string()
