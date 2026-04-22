@@ -29,6 +29,7 @@ export function ChatInterface() {
     endSession,
     isActive,
     runId,
+    activeAgent,
   } = useMultiTurnChat();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -155,7 +156,14 @@ export function ChatInterface() {
               <div className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Package className="size-3.5" />
               </div>
-              <span className="font-semibold text-sm text-foreground">CatalogManager</span>
+              <span className="font-semibold text-sm text-foreground">
+                {activeAgent?.name ?? "Assistant"}
+              </span>
+              {activeAgent && (
+                <span className="text-xs text-muted-foreground">
+                  Agent
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-3">
               {isActive && runId && (
@@ -212,15 +220,16 @@ export function ChatInterface() {
                   <div className="flex size-12 items-center justify-center rounded-2xl bg-secondary mb-4">
                     <Package className="size-6 text-muted-foreground" />
                   </div>
-                  <h2 className="text-lg font-semibold text-foreground mb-1">CatalogManager AI</h2>
+                  <h2 className="text-lg font-semibold text-foreground mb-1">E-Commerce Assistant</h2>
                   <p className="text-sm text-muted-foreground mb-6 max-w-md">
-                    Optimize product descriptions, category content, and SEO metadata using your brand voice.
+                    Optimize product content, manage orders, and more. I&apos;ll route you to the right specialist.
                   </p>
                   <div className="flex flex-wrap justify-center gap-2">
                     {[
                       "Optimize descriptions for electronics",
                       "Generate SEO data for all products",
-                      "Update the Sports category description",
+                      "Look up order ORD-10001",
+                      "Cancel order ORD-10004",
                     ].map((suggestion) => (
                       <button
                         key={suggestion}

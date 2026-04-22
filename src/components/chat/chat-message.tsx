@@ -5,11 +5,13 @@ import { isToolUIPart, getToolName } from "ai";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { Shimmer } from "@/components/ui/shimmer";
+import { OrderInfoCard } from "./order-info-card";
+import type { DataOrderInfo, DataAgentSwitch } from "@/lib/schemas/data-parts";
 import {
   CheckCircleIcon,
-  WrenchIcon,
   XCircleIcon,
   ClockIcon,
+  ArrowRightLeft,
 } from "lucide-react";
 
 const TOOL_LABELS: Record<string, string> = {
@@ -20,7 +22,28 @@ const TOOL_LABELS: Record<string, string> = {
   generate_seo_data: "Generating SEO data",
   save_products: "Waiting for approval to save products",
   save_categories: "Waiting for approval to save categories",
+  lookup_orders: "Looking up orders",
+  get_order_details: "Fetching order details",
+  cancel_order: "Cancelling order",
+  handoff: "Transferring to specialist",
+  route: "Routing request",
 };
+
+function isOrderInfoData(part: unknown): part is { type: "data-workflow"; data: DataOrderInfo["data"] & { type: "order-info" } } {
+  if (typeof part !== "object" || part === null) return false;
+  const p = part as Record<string, unknown>;
+  if (p.type !== "data-workflow" || !("data" in p)) return false;
+  const data = p.data as Record<string, unknown>;
+  return data?.type === "order-info";
+}
+
+function isAgentSwitchData(part: unknown): part is { type: "data-workflow"; data: DataAgentSwitch["data"] & { type: "agent-switch" } } {
+  if (typeof part !== "object" || part === null) return false;
+  const p = part as Record<string, unknown>;
+  if (p.type !== "data-workflow" || !("data" in p)) return false;
+  const data = p.data as Record<string, unknown>;
+  return data?.type === "agent-switch";
+}
 
 interface ChatMessageProps {
   message: UIMessage;
@@ -53,6 +76,22 @@ export function ChatMessage({ message }: ChatMessageProps) {
             ) : (
               <div key={i} className="prose prose-sm dark:prose-invert max-w-none leading-relaxed">
                 <ReactMarkdown>{part.text}</ReactMarkdown>
+              </div>
+            );
+          }
+
+          if (isOrderInfoData(part)) {
+            return <OrderInfoCard key={i} data={part.data} />;
+          }
+
+          if (isAgentSwitchData(part)) {
+            return (
+              <div
+                key={i}
+                className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground"
+              >
+                <ArrowRightLeft className="size-3.5" />
+                <span>Switched to <strong>{part.data.agentName}</strong></span>
               </div>
             );
           }

@@ -1,4 +1,5 @@
 import type { CatalogContent, SEOContent } from "./catalog";
+import type { OrderItem } from "./order";
 
 export type ItemStatus = "Pending" | "InProgress" | "Done" | "Failed";
 
@@ -44,7 +45,38 @@ export interface DataApprovalRequest {
   };
 }
 
+export interface DataOrderInfo {
+  type: "data-order-info";
+  id: string;
+  data: {
+    orderId: string;
+    customerName: string;
+    customerEmail: string;
+    status: string;
+    items: OrderItem[];
+    subtotal: number;
+    tax: number;
+    total: number;
+    shippingAddress: string;
+    trackingNumber?: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+}
+
+export interface DataAgentSwitch {
+  type: "data-agent-switch";
+  id: string;
+  data: {
+    agentId: string;
+    agentName: string;
+    timestamp: number;
+  };
+}
+
 export type CatalogDataPart =
   | DataProductContent
   | DataCategoryContent
-  | DataApprovalRequest;
+  | DataApprovalRequest
+  | DataOrderInfo
+  | DataAgentSwitch;

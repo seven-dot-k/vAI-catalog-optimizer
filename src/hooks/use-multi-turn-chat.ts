@@ -24,6 +24,28 @@ function isUserMessageMarker(
   return data?.type === "user-message";
 }
 
+interface AgentSwitchData {
+  type: "agent-switch";
+  agentId: string;
+  agentName: string;
+  timestamp: number;
+}
+
+function isAgentSwitchMarker(
+  part: unknown,
+): part is { type: "data-workflow"; data: AgentSwitchData } {
+  if (typeof part !== "object" || part === null) return false;
+  const p = part as Record<string, unknown>;
+  if (p.type !== "data-workflow" || !("data" in p)) return false;
+  const data = p.data as Record<string, unknown>;
+  return data?.type === "agent-switch";
+}
+
+export interface ActiveAgent {
+  id: string;
+  name: string;
+}
+
 export interface UseMultiTurnChatReturn {
   messages: UIMessage[];
   status: ChatStatus;
@@ -32,6 +54,7 @@ export interface UseMultiTurnChatReturn {
   runId: string | null;
   isActive: boolean;
   pendingMessage: string | null;
+  activeAgent: ActiveAgent | null;
   sendMessage: (text: string) => Promise<void>;
   stop: () => void;
   endSession: () => Promise<void>;
@@ -131,9 +154,11 @@ export function useMultiTurnChat(): UseMultiTurnChatReturn {
   }, [rawMessages, status]);
 
   // Process messages from the stream — extract user messages from data-workflow markers
-  const messages = useMemo(() => {
+  // and track the active agent from agent-switch markers.
+  const { messages, activeAgent } = useMemo(() => {
     const result: UIMessage[] = [];
     const seenMessageIds = new Set<string>();
+    let currentAgent: ActiveAgent | null = null;
 
     for (const msg of rawMessages) {
       // useChat adds optimistic local user messages, but in a durable workflow the
@@ -182,6 +207,14 @@ export function useMultiTurnChat(): UseMultiTurnChatReturn {
             continue;
           }
 
+          // Track agent switches for the header display
+          if (isAgentSwitchMarker(part)) {
+            currentAgent = {
+              id: part.data.agentId,
+              name: part.data.agentName,
+            };
+          }
+
           currentAssistantParts.push(part);
         }
 
@@ -195,7 +228,7 @@ export function useMultiTurnChat(): UseMultiTurnChatReturn {
       }
     }
 
-    return result;
+    return { messages: result, activeAgent: currentAgent };
   }, [rawMessages, pendingMessage]);
 
   // Send a follow-up message via hook resumption
@@ -318,6 +351,7 @@ export function useMultiTurnChat(): UseMultiTurnChatReturn {
     runId,
     isActive: !!runId,
     pendingMessage,
+    activeAgent,
     sendMessage,
     stop,
     endSession,

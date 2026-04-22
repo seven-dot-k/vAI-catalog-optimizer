@@ -8,6 +8,29 @@ export interface TurnObservability {
   isFirstTurn: boolean;
 }
 
+export async function writeAgentSwitch(
+  writable: WritableStream<UIMessageChunk>,
+  agentId: string,
+  agentName: string,
+) {
+  "use step";
+
+  const writer = writable.getWriter();
+  try {
+    await writer.write({
+      type: "data-workflow",
+      data: {
+        type: "agent-switch",
+        agentId,
+        agentName,
+        timestamp: Date.now(),
+      },
+    } as UIMessageChunk);
+  } finally {
+    writer.releaseLock();
+  }
+}
+
 export async function writeUserMessageMarker(
   writable: WritableStream<UIMessageChunk>,
   content: string,
