@@ -268,3 +268,6 @@ Each eval file contains two test suites: a **mocked suite** for fast determinist
 - **UI:** React 19, Radix UI, Tailwind CSS 4
 - **Validation:** Zod 4
 - **Testing:** Vitest with mock + live LLM eval modes
+
+## Additional POCs
+- v0 + Vercel AI SDK [2D Murder Mystery Game](https://github.com/seven-dot-k/fantastic-umbrella)
