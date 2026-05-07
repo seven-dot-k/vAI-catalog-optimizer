@@ -111,18 +111,21 @@ export async function writeStreamClose(
   "use step";
 
   const writer = writable.getWriter();
-  if (observability) {
-    await writer.write({
-      type: "data-workflow",
-      data: {
-        type: "workflow-end",
-        workflowRunId: observability.workflowRunId,
-        totalDurationMs: observability.totalDurationMs,
-        turnCount: observability.turnCount,
-        timestamp: Date.now(),
-      },
-    } as UIMessageChunk);
+  try {
+    if (observability) {
+      await writer.write({
+        type: "data-workflow",
+        data: {
+          type: "workflow-end",
+          workflowRunId: observability.workflowRunId,
+          totalDurationMs: observability.totalDurationMs,
+          turnCount: observability.turnCount,
+          timestamp: Date.now(),
+        },
+      } as UIMessageChunk);
+    }
+    await writer.write({ type: "finish" });
+  } finally {
+    writer.releaseLock();
   }
-  await writer.write({ type: "finish" });
-  writer.releaseLock();
 }
