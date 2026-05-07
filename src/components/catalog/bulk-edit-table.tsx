@@ -181,7 +181,8 @@ export function BulkEditTable({
             ✗ Reject
           </Button>
           <Button
-            variant="success"
+            variant="default"
+            className="bg-green-600 hover:bg-green-700 text-white"
             disabled={!pendingApproval}
             onClick={handleApprove}
           >

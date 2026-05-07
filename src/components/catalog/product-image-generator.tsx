@@ -115,9 +115,9 @@ function ImageThumbnail({
       <div className="mt-1.5 flex gap-1">
         <Button
           type="button"
-          variant={image.status === "approved" ? "success" : "outline"}
+          variant={image.status === "approved" ? "default" : "outline"}
           size="sm"
-          className="h-7 flex-1 text-xs"
+          className={cn("h-7 flex-1 text-xs", image.status === "approved" && "bg-green-600 hover:bg-green-700 text-white")}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -634,8 +634,8 @@ export function ProductImageGenerator({
 
             <div className="flex gap-2 border-t border-border p-4">
               <Button
-                variant={previewImage.status === "approved" ? "success" : "outline"}
-                className="flex-1"
+                variant={previewImage.status === "approved" ? "default" : "outline"}
+                className={cn("flex-1", previewImage.status === "approved" && "bg-green-600 hover:bg-green-700 text-white")}
                 onClick={() => {
                   handleApprove(previewImage.id);
                   setPreviewImage(null);
