@@ -31,21 +31,21 @@ async function generateSingleSeoData(
   const idField = entityType === "product" ? "sku" : "categoryId";
   const secondaryLabel = entityType === "product" ? (item.category ?? "") : (item.catalog ?? "");
 
-  // Emit InProgress status
-  await writer.write({
-    type: entityType === "product" ? "data-product-content" : "data-category-content",
-    id: `${toolCallId}-seo-${itemId}`,
-    data: {
-      [idField]: itemId,
-      name: item.name,
-      [entityType === "product" ? "category" : "catalog"]: secondaryLabel,
-      currentContent: item.content,
-      currentSeo: item.seoContent,
-      status: "InProgress",
-    },
-  } as UIMessageChunk);
-
   try {
+    // Emit InProgress status
+    await writer.write({
+      type: entityType === "product" ? "data-product-content" : "data-category-content",
+      id: `${toolCallId}-seo-${itemId}`,
+      data: {
+        [idField]: itemId,
+        name: item.name,
+        [entityType === "product" ? "category" : "catalog"]: secondaryLabel,
+        currentContent: item.content,
+        currentSeo: item.seoContent,
+        status: "InProgress",
+      },
+    } as UIMessageChunk);
+
     const { output } = await generateText({
       model: "anthropic/claude-haiku-4-5",
       output: Output.object({ schema: seoContentSchema }),
@@ -76,7 +76,6 @@ Generate:
       },
     } as UIMessageChunk);
 
-    writer.releaseLock();
     return { itemId, seoContent: output, status: "Done" as const };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -101,8 +100,9 @@ Generate:
       },
     } as UIMessageChunk);
 
-    writer.releaseLock();
     return { itemId, seoContent: undefined, status: "Failed" as const };
+  } finally {
+    writer.releaseLock();
   }
 }
 
@@ -117,25 +117,27 @@ async function emitPendingItems(
   const writer = writable.getWriter();
   const idField = entityType === "product" ? "sku" : "categoryId";
 
-  for (const item of items) {
-    const itemId = entityType === "product" ? (item.sku ?? item.name) : (item.id ?? item.name);
-    const secondaryLabel = entityType === "product" ? (item.category ?? "") : (item.catalog ?? "");
+  try {
+    for (const item of items) {
+      const itemId = entityType === "product" ? (item.sku ?? item.name) : (item.id ?? item.name);
+      const secondaryLabel = entityType === "product" ? (item.category ?? "") : (item.catalog ?? "");
 
-    await writer.write({
-      type: entityType === "product" ? "data-product-content" : "data-category-content",
-      id: `${toolCallId}-seo-${itemId}`,
-      data: {
-        [idField]: itemId,
-        name: item.name,
-        [entityType === "product" ? "category" : "catalog"]: secondaryLabel,
-        currentContent: item.content,
-        currentSeo: item.seoContent,
-        status: "Pending",
-      },
-    } as UIMessageChunk);
+      await writer.write({
+        type: entityType === "product" ? "data-product-content" : "data-category-content",
+        id: `${toolCallId}-seo-${itemId}`,
+        data: {
+          [idField]: itemId,
+          name: item.name,
+          [entityType === "product" ? "category" : "catalog"]: secondaryLabel,
+          currentContent: item.content,
+          currentSeo: item.seoContent,
+          status: "Pending",
+        },
+      } as UIMessageChunk);
+    }
+  } finally {
+    writer.releaseLock();
   }
-
-  writer.releaseLock();
 }
 
 // Workflow-level execute function (no "use step" — orchestrates steps)
