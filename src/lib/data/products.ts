@@ -239,3 +239,22 @@ export function getProducts(categoryId?: string): Product[] {
 export function getProductBySku(sku: string): Product | undefined {
   return products.find((p) => p.sku === sku);
 }
+
+export async function fetchProduct(sku: string): Promise<Product | undefined> {
+  await new Promise((resolve) => setTimeout(resolve, 200)); // Simulate network delay
+  return getProductBySku(sku);
+}
+
+export async function fetchProductSegmentPrice(sku: string, userSegment?: string): Promise<number> {
+  const basePrice = 49.99; // Base price for all products
+
+  // Simulate different pricing for user segments
+  switch (userSegment) {
+    case "premium":
+      return basePrice * 1.2; // 20% increase for premium users
+    case "student":
+      return basePrice * 0.8; // 20% discount for students
+    default:
+      return basePrice;
+  }
+}
