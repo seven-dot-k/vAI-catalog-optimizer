@@ -40,6 +40,7 @@ export interface UseMultiTurnChatReturn {
 export function useMultiTurnChat(): UseMultiTurnChatReturn {
   const [runId, setRunId] = useState<string | null>(null);
   const [shouldResume, setShouldResume] = useState(false);
+  const [chatId, setChatId] = useState(() => crypto.randomUUID());
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
   const sentMessagesRef = useRef<Set<string>>(new Set());
   const seenFromStreamRef = useRef<Set<string>>(new Set());
@@ -109,8 +110,8 @@ export function useMultiTurnChat(): UseMultiTurnChatReturn {
     status,
     error,
     stop,
-    setMessages,
   } = useChat({
+    id: chatId,
     resume: shouldResume,
     onError: (err) => {
       console.error("Chat error:", err);
@@ -304,7 +305,12 @@ export function useMultiTurnChat(): UseMultiTurnChatReturn {
     sentMessagesRef.current.clear();
     seenFromStreamRef.current.clear();
     setPendingMessage(null);
-    setMessages([]);
+    try {
+      stop();
+    } catch {
+      // Expected AbortError when stopping an active stream
+    }
+    setChatId(crypto.randomUUID());
 
     // Remove ?session= from the URL so a page refresh won't resume
     if (typeof window !== "undefined") {
@@ -313,12 +319,6 @@ export function useMultiTurnChat(): UseMultiTurnChatReturn {
         url.searchParams.delete("session");
         window.history.replaceState({}, "", url.toString());
       }
-    }
-
-    try {
-      stop();
-    } catch {
-      // Expected AbortError when stopping an active stream
     }
 
     if (currentRunId) {
@@ -334,7 +334,7 @@ export function useMultiTurnChat(): UseMultiTurnChatReturn {
         // Workflow will eventually time out on its own
       }
     }
-  }, [runId, setMessages, stop]);
+  }, [runId, stop]);
 
   return {
     messages,

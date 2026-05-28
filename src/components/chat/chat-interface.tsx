@@ -184,6 +184,14 @@ export function ChatInterface() {
 
   const renderHeaderActions = () => (
     <>
+      <span className="text-xs text-muted-foreground">
+        {isGenerating && (
+          <span className="flex items-center gap-1.5">
+            <span className="size-1.5 rounded-full bg-green-500 animate-pulse" />
+            Generating
+          </span>
+        )}
+      </span>
       {isActive && runId && (
         <button
           type="button"
@@ -206,14 +214,6 @@ export function ChatInterface() {
           <PlusIcon className="size-3" /> New Session
         </button>
       )}
-      <span className="text-xs text-muted-foreground">
-        {isGenerating && (
-          <span className="flex items-center gap-1.5">
-            <span className="size-1.5 rounded-full bg-green-500 animate-pulse" />
-            Generating
-          </span>
-        )}
-      </span>
     </>
   );
 
