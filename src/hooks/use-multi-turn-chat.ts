@@ -1,6 +1,6 @@
 "use client";
 
-import type { UIMessage, UIDataTypes, ChatStatus } from "ai";
+import type { UIMessage, ChatStatus } from "ai";
 import { useChat } from "@ai-sdk/react";
 import { WorkflowChatTransport } from "@workflow/ai";
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
@@ -62,8 +62,22 @@ export function useMultiTurnChat(): UseMultiTurnChatReturn {
     }
   }, []);
 
+  // Resets per-session dedup state when the server-side workflow ends. Invoked
+  // asynchronously by the transport, never during render, so the ref reads here
+  // are safe.
+  const handleChatEnd = useCallback(() => {
+    setRunId(null);
+    localStorage.removeItem(STORAGE_KEY);
+    sentMessagesRef.current.clear();
+    seenFromStreamRef.current.clear();
+    setPendingMessage(null);
+  }, []);
+
   const transport = useMemo(
     () =>
+      // The transport invokes its callbacks (e.g. onChatEnd) asynchronously,
+      // never during render, so passing a ref-reading callback into it is safe.
+      // eslint-disable-next-line react-hooks/refs -- callbacks run outside render
       new WorkflowChatTransport({
         api: "/api/chat",
         onChatSendMessage: (response) => {
@@ -73,26 +87,20 @@ export function useMultiTurnChat(): UseMultiTurnChatReturn {
             localStorage.setItem(STORAGE_KEY, workflowRunId);
           }
         },
-        onChatEnd: () => {
-          setRunId(null);
-          localStorage.removeItem(STORAGE_KEY);
-          sentMessagesRef.current.clear();
-          seenFromStreamRef.current.clear();
-          setPendingMessage(null);
-        },
-        prepareReconnectToStreamRequest: ({ api, ...rest }) => {
+        onChatEnd: handleChatEnd,
+        prepareReconnectToStreamRequest: (request) => {
           const storedRunId = localStorage.getItem(STORAGE_KEY);
           if (!storedRunId) {
             throw new Error("No active workflow run ID found");
           }
           return {
-            ...rest,
+            ...request,
             api: `/api/chat/${encodeURIComponent(storedRunId)}/stream`,
           };
         },
         maxConsecutiveErrors: 5,
       }),
-    [],
+    [handleChatEnd],
   );
 
   const {
@@ -168,12 +176,6 @@ export function useMultiTurnChat(): UseMultiTurnChatReturn {
               currentAssistantParts = [];
             }
 
-            seenFromStreamRef.current.add(data.content);
-
-            if (pendingMessage === data.content) {
-              setPendingMessage(null);
-            }
-
             result.push({
               id: data.id,
               role: "user",
@@ -196,6 +198,30 @@ export function useMultiTurnChat(): UseMultiTurnChatReturn {
     }
 
     return result;
+  }, [rawMessages]);
+
+  // Track user-message markers echoed back from the stream and clear the
+  // optimistic pending indicator once the server confirms the message. Kept in
+  // an effect (not the messages memo) so ref mutation and setState happen
+  // outside render.
+  useEffect(() => {
+    const seenContents: string[] = [];
+    for (const msg of rawMessages) {
+      if (msg.role !== "assistant") continue;
+      for (const part of msg.parts) {
+        if (isUserMessageMarker(part)) {
+          seenContents.push(part.data.content);
+        }
+      }
+    }
+
+    for (const content of seenContents) {
+      seenFromStreamRef.current.add(content);
+    }
+
+    if (pendingMessage !== null && seenContents.includes(pendingMessage)) {
+      setPendingMessage(null);
+    }
   }, [rawMessages, pendingMessage]);
 
   // Send a follow-up message via hook resumption

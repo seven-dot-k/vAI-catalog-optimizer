@@ -3,7 +3,7 @@ import type { UIMessageChunk } from "ai";
 import { getWritable, FatalError, RetryableError } from "workflow";
 import { z } from "zod";
 import { catalogContentSchema } from "@/lib/schemas/catalog";
-import type { CatalogContent, SEOContent } from "@/lib/schemas/catalog";
+import type { CatalogContent } from "@/lib/schemas/catalog";
 
 const MAX_BATCH_SIZE = 50;
 
