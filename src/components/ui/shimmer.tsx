@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import {
   type CSSProperties,
-  type ElementType,
   type JSX,
   memo,
   useMemo,
@@ -12,7 +11,7 @@ import {
 
 export interface TextShimmerProps {
   children: string;
-  as?: ElementType;
+  as?: keyof JSX.IntrinsicElements;
   className?: string;
   duration?: number;
   spread?: number;
@@ -25,8 +24,12 @@ const ShimmerComponent = ({
   duration = 2,
   spread = 2,
 }: TextShimmerProps) => {
-  const MotionComponent = motion.create(
-    Component as keyof JSX.IntrinsicElements
+  // Resolve to motion's stable built-in component for the tag via the proxy
+  // (e.g. motion.p). This is plain member access, so no component is created
+  // during render.
+  const MotionComponent = useMemo(
+    () => motion[Component as keyof typeof motion] as typeof motion.p,
+    [Component]
   );
 
   const dynamicSpread = useMemo(

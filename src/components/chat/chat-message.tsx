@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import { Shimmer } from "@/components/ui/shimmer";
 import {
   CheckCircleIcon,
-  WrenchIcon,
   XCircleIcon,
   ClockIcon,
 } from "lucide-react";
