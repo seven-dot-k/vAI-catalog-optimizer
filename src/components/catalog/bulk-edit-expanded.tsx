@@ -9,6 +9,8 @@ interface BulkEditExpandedProps {
   proposedContent?: CatalogContent;
   proposedSeo?: SEOContent;
   onContentChange: (field: string, value: string) => void;
+  /** When true, the Proposed column renders editable textareas. Defaults to read-only. */
+  editable?: boolean;
 }
 
 export function BulkEditExpanded({
@@ -17,6 +19,7 @@ export function BulkEditExpanded({
   proposedContent,
   proposedSeo,
   onContentChange,
+  editable = false,
 }: BulkEditExpandedProps) {
   return (
     <div className="grid grid-cols-2 gap-4 p-4 bg-card">
@@ -39,28 +42,66 @@ export function BulkEditExpanded({
         <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 pb-1 border-b border-border">
           Proposed
         </div>
-        <FieldReadOnly
+        <ProposedField
+          editable={editable}
           label="Short Description"
           value={proposedContent?.shortDescription ?? ""}
+          placeholder="No proposed short description"
+          onChange={(value) => onContentChange("shortDescription", value)}
         />
-        <FieldReadOnly
+        <ProposedField
+          editable={editable}
           label="Long Description"
           value={proposedContent?.longDescription ?? ""}
+          placeholder="No proposed long description"
+          onChange={(value) => onContentChange("longDescription", value)}
         />
         <div className="mt-2 pt-2 border-t border-dashed border-zinc-200">
           <span className="text-[10px] text-muted-foreground font-semibold uppercase">SEO</span>
-          <FieldReadOnly
+          <ProposedField
+            editable={editable}
             label="Meta Title"
             value={proposedSeo?.metaTitle ?? ""}
+            placeholder="No proposed meta title"
+            onChange={(value) => onContentChange("seoMetaTitle", value)}
           />
-          <FieldReadOnly
+          <ProposedField
+            editable={editable}
             label="Meta Description"
             value={proposedSeo?.metaDescription ?? ""}
+            placeholder="No proposed meta description"
+            onChange={(value) => onContentChange("seoMetaDescription", value)}
           />
         </div>
       </div>
     </div>
   );
+}
+
+function ProposedField({
+  editable,
+  label,
+  value,
+  placeholder,
+  onChange,
+}: {
+  editable: boolean;
+  label: string;
+  value: string;
+  placeholder: string;
+  onChange: (value: string) => void;
+}) {
+  if (editable) {
+    return (
+      <FieldEditable
+        label={label}
+        value={value}
+        placeholder={placeholder}
+        onChange={onChange}
+      />
+    );
+  }
+  return <FieldReadOnly label={label} value={value} />;
 }
 
 function FieldReadOnly({ label, value }: { label: string; value: string }) {
