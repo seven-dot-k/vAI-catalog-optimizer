@@ -1,6 +1,3 @@
-"use client";
-
-import { ClipboardList } from "lucide-react";
 import { BulkEditTable, type BulkEditItem } from "@/components/catalog/bulk-edit-table";
 
 interface CatalogPanelProps {
@@ -24,13 +21,6 @@ export function CatalogPanel({
 
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* Panel header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
-        <ClipboardList className="size-4 text-muted-foreground" />
-        <span className="font-semibold text-sm text-foreground">Content Review</span>
-      </div>
-
-      {/* Panel content */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {productItems.length > 0 && (
           <BulkEditTable

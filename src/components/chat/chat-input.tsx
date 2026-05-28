@@ -14,8 +14,9 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
 
   useEffect(() => {
     if (textareaRef.current) {
+      const minHeight = 64;
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+      textareaRef.current.style.height = `${Math.min(Math.max(textareaRef.current.scrollHeight, minHeight), 200)}px`;
     }
   }, [input]);
 
@@ -45,10 +46,10 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask me to optimize products, categories, or SEO data..."
+          placeholder="Ask about products, categories, or SEO..."
           disabled={disabled}
           rows={1}
-          className="flex-1 resize-none bg-transparent px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none disabled:opacity-50"
+          className="min-h-16 flex-1 resize-none overflow-y-auto bg-transparent px-4 py-3 text-sm leading-5 text-foreground placeholder:text-muted-foreground outline-none disabled:opacity-50"
         />
         <button
           type="submit"
